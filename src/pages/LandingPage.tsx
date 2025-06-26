@@ -1,4 +1,4 @@
-const LandingPage = () => {
+import { Link } from 'react-router-dom';const LandingPage = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-stone-100 to-amber-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
@@ -11,19 +11,19 @@ const LandingPage = () => {
           </p>
   
           <div className="space-y-4 mb-16">
-            <button
+            <Link
+              to="/create"
               className="w-full max-w-md mx-auto block py-3 px-6 border border-transparent shadow-sm text-lg font-medium rounded-md text-white bg-stone-600 hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500 transition-colors"
-              disabled
             >
-              Create New Room (Coming Soon)
-            </button>
+              Create New House
+            </Link>
             
-            <button
+            <Link
+              to="/join"
               className="w-full max-w-md mx-auto block py-3 px-6 border-2 border-stone-600 shadow-sm text-lg font-medium rounded-md text-stone-700 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500 transition-colors"
-              disabled
             >
-              Join Room (Coming Soon)
-            </button>
+              Join House
+            </Link>
           </div>
   
           {/* Game Overview */}
@@ -100,22 +100,6 @@ const LandingPage = () => {
                   <path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 21h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z"></path>
                 </svg>
                 <span>LinkedIn</span>
-              </a>
-              <a
-                href="https://docs.google.com/forms/d/e/1FAIpQLScZ0cSxMSAYNhJxcw757hBjZqvR38eNb3pSI1XQkwHX3DWwmQ/viewform?usp=header"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center text-stone-600 hover:text-stone-800 transition"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-5 h-5 mr-2"
-                >
-                  <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"></path>
-                </svg>
-                <span>Give Feedback</span>
               </a>
             </div>
             
