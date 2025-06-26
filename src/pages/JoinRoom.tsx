@@ -1,27 +1,18 @@
+// src/pages/JoinRoom.tsx
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useJoinRoom } from '../hooks/useRoom';
 
 const JoinRoom = () => {
+  const { joinRoom, isLoading, error } = useJoinRoom();
   const [formData, setFormData] = useState({
     playerName: '',
     roomCode: '',
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    // TODO: Implement room joining logic with backend
-    console.log('Joining room with:', formData);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setError('Backend not implemented yet. Coming soon!');
-    }, 1000);
+    await joinRoom(formData.playerName, formData.roomCode);
   };
 
   return (
@@ -37,7 +28,7 @@ const JoinRoom = () => {
             </svg>
             Back to Home
           </Link>
-          <h2 className="text-3xl font-bold text-stone-800">Join Room</h2>
+          <h2 className="text-3xl font-bold text-stone-800">Join House</h2>
           <p className="mt-2 text-stone-600">Enter the room code to apply for residence</p>
         </div>
 
@@ -94,7 +85,7 @@ const JoinRoom = () => {
             disabled={isLoading || formData.roomCode.length !== 4}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-stone-600 hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500 disabled:bg-stone-400 transition-colors"
           >
-            {isLoading ? 'Joining Room...' : 'Join Room'}
+            {isLoading ? 'Joining House...' : 'Join House'}
           </button>
         </form>
 
@@ -102,7 +93,7 @@ const JoinRoom = () => {
           <p className="text-sm text-stone-600">
             Need to create a new game room?{' '}
             <Link to="/create" className="text-stone-700 hover:text-stone-800 font-medium">
-              Create Room
+              Create House
             </Link>
           </p>
         </div>
