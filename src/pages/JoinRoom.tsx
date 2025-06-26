@@ -37,8 +37,8 @@ const JoinRoom = () => {
             </svg>
             Back to Home
           </Link>
-          <h2 className="text-3xl font-bold text-stone-800">Join House</h2>
-          <p className="mt-2 text-stone-600">Enter the room code to move in</p>
+          <h2 className="text-3xl font-bold text-stone-800">Join Room</h2>
+          <p className="mt-2 text-stone-600">Enter the room code to apply for residence</p>
         </div>
 
         {error && (
@@ -78,18 +78,14 @@ const JoinRoom = () => {
               maxLength={4}
               required
             />
-            <p className="mt-1 text-xs text-stone-500">
-              Get this code from your friend who created the house
-            </p>
           </div>
 
           <div className="bg-stone-50 p-4 rounded-lg">
             <h3 className="text-sm font-medium text-stone-800 mb-2">What to Expect</h3>
             <div className="text-xs text-stone-600 space-y-1">
-              <p>• Wait for all roommates to join the house</p>
-              <p>• Pitch yourself with positive traits and quirky flaws</p>
-              <p>• Vote together on who gets to stay</p>
-              <p>• Have fun getting to know your potential roommates!</p>
+              <p>• Wait for all players to join the room</p>
+              <p>• Pitch yourself with your positive traits and quirky flaws</p>
+              <p>• Hope you get chosen as a new roommate</p>
             </div>
           </div>
 
@@ -98,13 +94,13 @@ const JoinRoom = () => {
             disabled={isLoading || formData.roomCode.length !== 4}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-stone-600 hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500 disabled:bg-stone-400 transition-colors"
           >
-            {isLoading ? 'Joining House...' : 'Join House'}
+            {isLoading ? 'Joining Room...' : 'Join Room'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-stone-600">
-            Need to create a new house?{' '}
+            Need to create a new game room?{' '}
             <Link to="/create" className="text-stone-700 hover:text-stone-800 font-medium">
               Create Room
             </Link>

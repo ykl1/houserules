@@ -38,7 +38,7 @@ const CreateRoom = () => {
             Back to Home
           </Link>
           <h2 className="text-3xl font-bold text-stone-800">Create Room</h2>
-          <p className="mt-2 text-stone-600">Set up your house and invite roommates</p>
+          <p className="mt-2 text-stone-600">Set up your house and invite applicants</p>
         </div>
 
         {error && (
@@ -102,9 +102,8 @@ const CreateRoom = () => {
             <h3 className="text-sm font-medium text-stone-800 mb-2">Game Preview</h3>
             <div className="text-xs text-stone-600 space-y-1">
               <p>• Players will pitch themselves as ideal roommates</p>
-              <p>• Each round, the household grows by one resident</p>
-              <p>• Use positive traits to convince, navigate quirky flaws</p>
-              <p>• Household votes together on new roommates</p>
+              <p>• Household votes on picking a new roommate each round</p>
+              <p>• Household grows by one resident each round until reaching capacity</p>
             </div>
           </div>
 
@@ -113,7 +112,7 @@ const CreateRoom = () => {
             disabled={isLoading}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-stone-600 hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500 disabled:bg-stone-400 transition-colors"
           >
-            {isLoading ? 'Creating House...' : 'Create House'}
+            {isLoading ? 'Creating Room...' : 'Create Room'}
           </button>
         </form>
 
