@@ -99,9 +99,9 @@ const GameRoom = () => {
     setGameState(roomObj["room"].gameState);
     localStorage.setItem('gameState', roomObj["room"].gameState);
     
-    // Update current player's cards if they are an applicant
+    // Update current player's cards if they are a non-host player
     const updatedPlayer = roomObj["room"].players.find((p: Player) => p.id === currentPlayer?.id);
-    if (updatedPlayer && !updatedPlayer.isInHouse) {
+    if (updatedPlayer && !updatedPlayer.isHost) {
       setCurrentPlayer(updatedPlayer);
     }
   });
@@ -243,10 +243,68 @@ const GameRoom = () => {
                 </div>
               </div>
             ) : (
-              <div className="text-center p-8 bg-stone-50 rounded-lg">
-                <h3 className="text-xl font-semibold mb-4 text-stone-800">
-                  TODO: implement card drawing logic
-                </h3>
+              <div className="space-y-4">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-semibold text-stone-800 mb-2">
+                    Choose Your Roommate Qualities
+                  </h3>
+                  <p className="text-sm text-stone-600">
+                    (2 green, 1 red)
+                  </p>
+                </div>
+                
+                {/* Mobile-optimized card display */}
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {/* Green Cards */}
+                  {currentPlayer?.greenCards.map((card, index) => (
+                    <div
+                      key={card.id}
+                      className="p-4 bg-green-50 border-2 border-green-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                          <span className="text-white font-bold text-sm">{index + 1}</span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-xs font-medium text-green-700 mb-1">
+                            POSITIVE TRAIT
+                          </div>
+                          <p className="text-stone-800 font-medium leading-snug">
+                            {card.text}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {/* Red Cards */}
+                  {(currentPlayer as any)?.redCards?.map((card: any, index: number) => (
+                    <div
+                      key={card.id}
+                      className="p-4 bg-red-50 border-2 border-red-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mr-3">
+                          <span className="text-white font-bold text-sm">{index + 1}</span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-xs font-medium text-red-700 mb-1">
+                            QUIRKY FLAW
+                          </div>
+                          <p className="text-stone-800 font-medium leading-snug">
+                            {card.text}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-6 p-3 bg-stone-50 rounded-lg">
+                  <p className="text-xs text-stone-600 text-center">
+                    📱 Scroll up and down to see all your cards. Choose 2 green cards and 1 red card to represent yourself.
+                  </p>
+                </div>
               </div>
             )}
           </div>

@@ -16,6 +16,7 @@ export interface Room {
     isInHouse: boolean; // true if player is a resident, false if still applicant
     greenCards: GreenCard[];
     redCard: RedCard | null;
+    redCards?: RedCard[]; // Temporary property for multiple red cards
     hasSubmittedPitch: boolean;
   }
   
@@ -38,3 +39,4 @@ export interface Room {
   }
   
   export type GameState = 'waiting' | 'pitching' | 'voting' | 'finished' | 'error';
+  

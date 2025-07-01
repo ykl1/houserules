@@ -164,15 +164,27 @@ class RoomManager {
     const shuffledGreen = [...greenCards].sort(() => Math.random() - 0.5);
     const shuffledRed = [...redCards].sort(() => Math.random() - 0.5);
 
-    // Deal 2 green cards and 1 red card to each applicant (non-house members)
-    const applicants = room.players.filter(p => !p.isInHouse);
+    // Deal 4 green cards and 2 red cards to each non-host player
+    const nonHostPlayers = room.players.filter(p => !p.isHost);
     
-    applicants.forEach((player, index) => {
+    nonHostPlayers.forEach((player, playerIndex) => {
+      // Give each player 4 unique green cards
       player.greenCards = [
-        shuffledGreen[index * 2],
-        shuffledGreen[index * 2 + 1]
+        shuffledGreen[playerIndex * 4],
+        shuffledGreen[playerIndex * 4 + 1],
+        shuffledGreen[playerIndex * 4 + 2],
+        shuffledGreen[playerIndex * 4 + 3]
       ];
-      player.redCard = shuffledRed[index];
+      
+      // Give each player 2 unique red cards  
+      const redCardIndices = [playerIndex * 2, playerIndex * 2 + 1];
+      player.redCard = null; // We'll store red cards in a separate array
+      
+      // Add red cards to a new property for now
+      (player as any).redCards = [
+        shuffledRed[redCardIndices[0]],
+        shuffledRed[redCardIndices[1]]
+      ];
     });
   }
 }

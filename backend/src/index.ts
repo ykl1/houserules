@@ -146,8 +146,8 @@ io.on('connection', (socket) => {
       
       room.gameState = "pitching";
       
-      // Don't deal cards yet - just change the state
-      // roomManager.dealCards(roomCode);
+      // Deal cards to all non-host players
+      roomManager.dealCards(roomCode);
       
       io.to(roomCode).emit('pitching_state', { room });
     } catch (error) {
