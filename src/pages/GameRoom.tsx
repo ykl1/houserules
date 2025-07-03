@@ -16,6 +16,10 @@ const GameRoom = () => {
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
   const [isHost, setIsHost] = useState(false);
   const [houseCapacity, setHouseCapacity] = useState(2);
+  
+  // Card selection state
+  const [selectedGreenCards, setSelectedGreenCards] = useState<string[]>([]);
+  const [selectedRedCard, setSelectedRedCard] = useState<string | null>(null);
 
   const handleHomeClick = () => {
     navigate("/");
@@ -27,6 +31,30 @@ const GameRoom = () => {
   const hasEnoughPlayers = totalPlayers >= requiredPlayers;
   const residentsCount = players.filter(p => p.isInHouse).length;
   const applicantsCount = players.filter(p => !p.isInHouse).length;
+
+  // Card selection handlers
+  const handleGreenCardClick = (cardId: string) => {
+    if (selectedGreenCards.includes(cardId)) {
+      // Deselect card
+      setSelectedGreenCards(selectedGreenCards.filter(id => id !== cardId));
+    } else if (selectedGreenCards.length < 2) {
+      // Select card (max 2)
+      setSelectedGreenCards([...selectedGreenCards, cardId]);
+    }
+  };
+
+  const handleRedCardClick = (cardId: string) => {
+    if (selectedRedCard === cardId) {
+      // Deselect card
+      setSelectedRedCard(null);
+    } else {
+      // Select card (only 1 allowed)
+      setSelectedRedCard(cardId);
+    }
+  };
+
+  // Check if ready to apply
+  const isReadyToApply = selectedGreenCards.length === 2 && selectedRedCard !== null;
 
   useEffect(() => {
     // Check for existing session data
@@ -249,62 +277,126 @@ const GameRoom = () => {
                     Choose Your Roommate Qualities
                   </h3>
                   <p className="text-sm text-stone-600">
-                    (2 green, 1 red)
+                    Select 2 green cards (your qualities) and 1 red card (to sabotage {(currentPlayer as any)?.sabotageTarget})
                   </p>
+                </div>
+                
+                {/* Instructions */}
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                  <div className="text-xs text-blue-800 space-y-1">
+                    <p><strong>Green Cards:</strong> Choose 2 positive traits to represent yourself</p>
+                    <p><strong>Red Cards:</strong> Choose 1 flaw to sabotage {(currentPlayer as any)?.sabotageTarget}</p>
+                  </div>
                 </div>
                 
                 {/* Mobile-optimized card display */}
                 <div className="space-y-4 max-h-96 overflow-y-auto">
-                  {/* Green Cards */}
-                  {currentPlayer?.greenCards.map((card, index) => (
-                    <div
-                      key={card.id}
-                      className="p-4 bg-green-50 border-2 border-green-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
-                          <span className="text-white font-bold text-sm">{index + 1}</span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="text-xs font-medium text-green-700 mb-1">
-                            POSITIVE TRAIT
+                  {/* Green Cards Section */}
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-semibold text-green-700 px-2">
+                      YOUR POSITIVE TRAITS (Choose 2)
+                    </h4>
+                    {currentPlayer?.greenCards.map((card, index) => {
+                      const isSelected = selectedGreenCards.includes(card.id);
+                      return (
+                        <div
+                          key={card.id}
+                          onClick={() => handleGreenCardClick(card.id)}
+                          className={`p-4 border-2 rounded-lg shadow-sm transition-all cursor-pointer ${
+                            isSelected 
+                              ? 'bg-green-100 border-green-500 shadow-md scale-[1.02]' 
+                              : 'bg-green-50 border-green-200 hover:shadow-md hover:border-green-300'
+                          }`}
+                        >
+                          <div className="flex items-start">
+                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
+                              isSelected ? 'bg-green-600' : 'bg-green-500'
+                            }`}>
+                              {isSelected ? (
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              ) : (
+                                <span className="text-white font-bold text-sm">{index + 1}</span>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-xs font-medium text-green-700 mb-1">
+                                POSITIVE TRAIT
+                              </div>
+                              <p className="text-stone-800 font-medium leading-snug">
+                                {card.text}
+                              </p>
+                            </div>
                           </div>
-                          <p className="text-stone-800 font-medium leading-snug">
-                            {card.text}
-                          </p>
                         </div>
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    })}
+                  </div>
                   
-                  {/* Red Cards */}
-                  {(currentPlayer as any)?.redCards?.map((card: any, index: number) => (
-                    <div
-                      key={card.id}
-                      className="p-4 bg-red-50 border-2 border-red-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mr-3">
-                          <span className="text-white font-bold text-sm">{index + 1}</span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="text-xs font-medium text-red-700 mb-1">
-                            QUIRKY FLAW
+                  {/* Red Cards Section */}
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-semibold text-red-700 px-2">
+                      SABOTAGE {((currentPlayer as any)?.sabotageTarget || '').toUpperCase()} (Choose 1)
+                    </h4>
+                    {(currentPlayer as any)?.redCards?.map((card: any, index: number) => {
+                      const isSelected = selectedRedCard === card.id;
+                      return (
+                        <div
+                          key={card.id}
+                          onClick={() => handleRedCardClick(card.id)}
+                          className={`p-4 border-2 rounded-lg shadow-sm transition-all cursor-pointer ${
+                            isSelected 
+                              ? 'bg-red-100 border-red-500 shadow-md scale-[1.02]' 
+                              : 'bg-red-50 border-red-200 hover:shadow-md hover:border-red-300'
+                          }`}
+                        >
+                          <div className="flex items-start">
+                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
+                              isSelected ? 'bg-red-600' : 'bg-red-500'
+                            }`}>
+                              {isSelected ? (
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              ) : (
+                                <span className="text-white font-bold text-sm">{index + 1}</span>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-xs font-medium text-red-700 mb-1">
+                                QUIRKY FLAW
+                              </div>
+                              <p className="text-stone-800 font-medium leading-snug">
+                                {card.text}
+                              </p>
+                            </div>
                           </div>
-                          <p className="text-stone-800 font-medium leading-snug">
-                            {card.text}
-                          </p>
                         </div>
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    })}
+                  </div>
                 </div>
                 
-                <div className="mt-6 p-3 bg-stone-50 rounded-lg">
-                  <p className="text-xs text-stone-600 text-center">
-                    📱 Scroll up and down to see all your cards. Choose 2 green cards and 1 red card to represent yourself.
-                  </p>
+                {/* Selection Summary */}
+                <div className="mt-4 p-3 bg-stone-50 rounded-lg">
+                  <div className="text-xs text-stone-600 space-y-1">
+                    <p>✅ Green Cards Selected: {selectedGreenCards.length}/2</p>
+                    <p>✅ Red Card Selected: {selectedRedCard ? '1/1' : '0/1'}</p>
+                  </div>
                 </div>
+                
+                {/* Ready to Apply Button */}
+                <button
+                  disabled={!isReadyToApply}
+                  className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
+                    isReadyToApply
+                      ? 'bg-stone-600 text-white hover:bg-stone-700'
+                      : 'bg-stone-300 text-stone-500 cursor-not-allowed'
+                  }`}
+                >
+                  {isReadyToApply ? 'Ready to Apply' : 'Select Your Cards'}
+                </button>
               </div>
             )}
           </div>

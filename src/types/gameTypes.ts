@@ -17,6 +17,7 @@ export interface Room {
     greenCards: GreenCard[];
     redCard: RedCard | null;
     redCards?: RedCard[]; // Temporary property for multiple red cards
+    sabotageTarget?: string; // Name of player to sabotage
     hasSubmittedPitch: boolean;
   }
   

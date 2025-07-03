@@ -164,8 +164,11 @@ class RoomManager {
     const shuffledGreen = [...greenCards].sort(() => Math.random() - 0.5);
     const shuffledRed = [...redCards].sort(() => Math.random() - 0.5);
 
-    // Deal 4 green cards and 2 red cards to each non-host player
+    // Get all non-host players
     const nonHostPlayers = room.players.filter(p => !p.isHost);
+    
+    // Create sabotage assignments - each player sabotages exactly one other player
+    const sabotageAssignments = this.createSabotageAssignments(nonHostPlayers);
     
     nonHostPlayers.forEach((player, playerIndex) => {
       // Give each player 4 unique green cards
@@ -180,12 +183,30 @@ class RoomManager {
       const redCardIndices = [playerIndex * 2, playerIndex * 2 + 1];
       player.redCard = null; // We'll store red cards in a separate array
       
-      // Add red cards to a new property for now
+      // Add red cards and sabotage target to player
       (player as any).redCards = [
         shuffledRed[redCardIndices[0]],
         shuffledRed[redCardIndices[1]]
       ];
+      
+      // Assign sabotage target
+      (player as any).sabotageTarget = sabotageAssignments[player.id];
     });
+  }
+
+  private createSabotageAssignments(players: Player[]): { [playerId: string]: string } {
+    const assignments: { [playerId: string]: string } = {};
+    const playerIds = players.map(p => p.id);
+    const playerNames = players.map(p => p.name);
+    
+    // Create a circular assignment so each player gets exactly one red card
+    for (let i = 0; i < playerIds.length; i++) {
+      const currentPlayerId = playerIds[i];
+      const targetPlayerName = playerNames[(i + 1) % playerIds.length]; // Next player in circle
+      assignments[currentPlayerId] = targetPlayerName;
+    }
+    
+    return assignments;
   }
 }
 
