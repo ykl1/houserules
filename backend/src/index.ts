@@ -155,7 +155,112 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Get all current players upon request
+  socket.on('host_start_round', ({ roomCode }) => {
+    try {
+      const room = roomManager.getRoom(roomCode);
+      if (!room) throw new Error('Room not found');
+      
+      // Validate all non-host players have submitted
+      const nonHostPlayers = room.players.filter(p => !p.isHost);
+      const submittedCount = nonHostPlayers.filter(p => p.hasSubmittedPitch).length;
+      
+      if (submittedCount !== nonHostPlayers.length) {
+        throw new Error('Not all players have submitted applications');
+      }
+      
+      // Change game state to pitching
+      room.gameState = "pitching";
+      
+      // Randomly select first pitching player
+      const randomIndex = Math.floor(Math.random() * nonHostPlayers.length);
+      const firstPitchingPlayer = nonHostPlayers[randomIndex];
+      
+      // Get the actual card objects for the selected cards
+      const selectedGreenCardObjects = (firstPitchingPlayer as any).selectedGreenCards.map((cardId: string) => 
+        firstPitchingPlayer.greenCards.find(card => card.id === cardId)
+      ).filter(Boolean);
+      
+      const selectedRedCardObject = (firstPitchingPlayer as any).redCards?.find((card: any) => 
+        card.id === (firstPitchingPlayer as any).selectedRedCard
+      );
+      
+      // Set current pitching player with actual card objects
+      (room as any).currentPitchingPlayer = {
+        id: firstPitchingPlayer.id,
+        name: firstPitchingPlayer.name,
+        selectedGreenCards: selectedGreenCardObjects,
+        selectedRedCard: selectedRedCardObject
+      };
+      
+      console.log(`Round started. ${firstPitchingPlayer.name} is first to pitch.`);
+      
+      // Notify all players
+      io.to(roomCode).emit('round_started', { 
+        room,
+        currentPitchingPlayer: (room as any).currentPitchingPlayer
+      });
+      
+    } catch (error) {
+      emitServerError(roomCode, error.message);
+    }
+  });
+
+  socket.on('submit_application', ({ roomCode, playerId, selectedGreenCards, selectedRedCard }, callback) => {
+    try {
+      const room = roomManager.getRoom(roomCode);
+      if (!room) throw new Error('Room not found');
+
+      const player = room.players.find(p => p.id === playerId);
+      if (!player) throw new Error('Player not found');
+      
+      // Gracefully handle if player quickly clicks submit button multiple times
+      if (player.hasSubmittedPitch) {
+        console.log(`Player (${player.id}) attempted to submit application more than once`);
+        callback({ success: false, error: 'Application already submitted' });
+        return;
+      }
+
+      // Store selected cards and unselected cards
+      const allGreenCards = player.greenCards;
+      const allRedCards = (player as any).redCards || [];
+      
+      const unselectedGreenCards = allGreenCards.filter(card => !selectedGreenCards.includes(card.id));
+      const unselectedRedCards = allRedCards.filter((card: any) => card.id !== selectedRedCard);
+
+      // Update player with selected and unselected cards
+      (player as any).selectedGreenCards = selectedGreenCards;
+      (player as any).selectedRedCard = selectedRedCard;
+      (player as any).unselectedGreenCards = unselectedGreenCards;
+      (player as any).unselectedRedCards = unselectedRedCards;
+      
+      player.hasSubmittedPitch = true;
+
+      // Count total submissions
+      const nonHostPlayers = room.players.filter(p => !p.isHost);
+      const submittedCount = nonHostPlayers.filter(p => p.hasSubmittedPitch).length;
+
+      console.log(`Player ${player.name} submitted application. ${submittedCount}/${nonHostPlayers.length} submitted.`);
+
+      // Notify all players of submission count update
+      io.to(roomCode).emit('application_count_update', {
+        submittedCount,
+        totalPlayers: nonHostPlayers.length
+      });
+
+      // If all non-host players have submitted, notify host
+      if (submittedCount === nonHostPlayers.length) {
+        const host = room.players.find(p => p.isHost);
+        if (host) {
+          io.to(host.socketId).emit('all_applications_submitted');
+        }
+      }
+
+      callback({ success: true });
+    } catch (error) {
+      callback({ success: false, error: error.message });
+      emitServerError(roomCode, error.message);
+    }
+  });
   socket.on('get_current_players', ({ roomCode }) => {
     try {
       const room = roomManager.getRoom(roomCode);
